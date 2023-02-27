@@ -41,6 +41,13 @@ void show_landing_page() {
    selections, the function returns a 32-bit integer that encodes the selected
    configuration options using bit shifting and bitwise OR operations.
     @return A 32-bit integer that encodes the selected configuration options.
+    
+    0b0000_0000_0000_0000_0000_0000_0000_0000
+    No change flag: 0b0000_0000_0000_0001_0000_0000_0000_0000
+    Shutdown flag: 0b1000_0000_0000_0000_0000_0000_0000_0000
+    COMP/INT flag: 0b0100_0000_0000_0000_0000_0000_0000_0000
+
+
     */
 uint32_t show_config_menu() {
   char option;

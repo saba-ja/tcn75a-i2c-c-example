@@ -141,9 +141,6 @@ void handle_show_config() {
   show_landing_page();
   uint8_t config_result = read_config(i2c, dev_addr);
   printf("Sensor Config Status\n");
-  printf("curr 0x%x\n", curr_config_result);
-  printf("new 0x%x\n", new_config_result);
-  printf("user 0x%x\n", user_config_result);
   parse_config(config_result);
   multicore_fifo_push_blocking(ENABLE_IRQ);
 }
