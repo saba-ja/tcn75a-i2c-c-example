@@ -13,13 +13,24 @@ typedef struct {
 
 void set_i2c(const I2CConfig *i2c, size_t len);
 
-int reg_write(i2c_inst_t *i2c, const uint8_t addr, const uint8_t reg,
+int reg_write(i2c_inst_t *i2c_inst, const uint8_t addr, const uint8_t reg,
               uint8_t *buf, const uint8_t nbytes);
 
-int reg_read(i2c_inst_t *i2c, const uint8_t addr, const uint8_t reg,
+int reg_read(i2c_inst_t *i2c_inst, const uint8_t addr, const uint8_t reg,
              uint8_t *buf, const uint8_t nbytes);
 
 void scan_i2c_bus(i2c_inst_t *i2c, uint timeout);
 bool reserved_addr(uint8_t addr);
 int check_addr(i2c_inst_t *i2c, uint8_t addr, uint8_t *rxdata, uint timeout);
+
+void read_temp_reg(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint8_t nbytes);
+void write_temp_reg(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint8_t nbytes);
+void read_temperature_registers(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint8_t nbytes, const char *message);
+void print_ambient_temperature(i2c_inst_t *i2c, uint8_t dev_addr);
+void read_temp_hyst_limit(i2c_inst_t *i2c, uint8_t dev_addr);
+void write_temp_hyst_limit(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t integer_part, uint8_t decimal_part);
+void read_temp_set_limit(i2c_inst_t *i2c, uint8_t dev_addr);
+void write_temp_set_limit(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t integer_part, uint8_t decimal_part);
+void read_config(i2c_inst_t *i2c, uint8_t dev_addr);
+
 #endif

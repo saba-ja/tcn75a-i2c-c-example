@@ -1,6 +1,8 @@
 #include "i2c_util.h"
 
 #include "util.h"
+#include "config.h"
+#include "menu_handler.h"
 
 void set_i2c(const I2CConfig *i2c, size_t len) {
   for (size_t i; i < len; i++) {
@@ -14,7 +16,7 @@ void set_i2c(const I2CConfig *i2c, size_t len) {
 }
 
 // Write 1 byte to the specified register
-int reg_write(i2c_inst_t *i2c, const uint8_t addr, const uint8_t reg,
+int reg_write(i2c_inst_t *i2c_inst, const uint8_t addr, const uint8_t reg,
               uint8_t *buf, const uint8_t nbytes) {
   int num_bytes_read = 0;
   uint8_t msg[nbytes + 1];
@@ -31,14 +33,14 @@ int reg_write(i2c_inst_t *i2c, const uint8_t addr, const uint8_t reg,
   }
 
   // Write data to register(s) over I2C
-  num_bytes_read = i2c_write_blocking(i2c, addr, msg, (nbytes + 1), false);
+  num_bytes_read = i2c_write_blocking(i2c_inst, addr, msg, (nbytes + 1), false);
 
   return num_bytes_read;
 }
 
 // Read byte(s) from specified register. If nbytes > 1, read from consecutive
 // registers.
-int reg_read(i2c_inst_t *i2c, const uint8_t addr, const uint8_t reg,
+int reg_read(i2c_inst_t *i2c_inst, const uint8_t addr, const uint8_t reg,
              uint8_t *buf, const uint8_t nbytes) {
   int num_bytes_read = 0;
 
@@ -48,8 +50,8 @@ int reg_read(i2c_inst_t *i2c, const uint8_t addr, const uint8_t reg,
   }
 
   // Read data from register(s) over I2C
-  i2c_write_blocking(i2c, addr, &reg, 1, true);
-  num_bytes_read = i2c_read_blocking(i2c, addr, buf, nbytes, false);
+  i2c_write_blocking(i2c_inst, addr, &reg, 1, true);
+  num_bytes_read = i2c_read_blocking(i2c_inst, addr, buf, nbytes, false);
 
   return num_bytes_read;
 }
@@ -98,4 +100,60 @@ bool reserved_addr(uint8_t addr) {
   } else {
     return 0;
   }
+}
+
+
+void read_temp_reg(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint8_t nbytes) {
+  reg_read(i2c, dev_addr, reg_addr, buf, nbytes);
+}
+
+void write_temp_reg(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint8_t nbytes) {
+  reg_write(i2c, dev_addr, reg_addr, buf, nbytes);
+}
+
+void read_temperature_registers(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint8_t nbytes, const char *message) {
+  read_temp_reg(i2c, dev_addr, reg_addr, buf, nbytes);
+  printf("%s\n", message);
+  print_temp_table(buf[0], buf[1]);
+}
+
+void print_ambient_temperature(i2c_inst_t *i2c, uint8_t dev_addr) {
+  uint8_t nbytes = 2;
+  uint8_t tmp[2] = {0, 0};
+  clear_screen();
+  read_temperature_registers(i2c, dev_addr, AMBIENT_TEMP_REG, tmp, nbytes, "Ambient Temperature");
+}
+
+void read_temp_hyst_limit(i2c_inst_t *i2c, uint8_t dev_addr) {
+  uint8_t nbytes = 2;
+  uint8_t tmp[2] = {0, 0};
+  read_temperature_registers(i2c, dev_addr, TEMP_HYST_MIN_REG, tmp, nbytes, "Temperature Hyst Limit");
+}
+
+void write_temp_hyst_limit(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t integer_part, uint8_t decimal_part) {
+  uint8_t nbytes = 2;
+  uint8_t tmp[2] = {integer_part, decimal_part};
+  write_temp_reg(i2c, dev_addr, TEMP_HYST_MIN_REG, tmp, nbytes);
+  read_temp_hyst_limit(i2c, dev_addr);
+}
+
+void read_temp_set_limit(i2c_inst_t *i2c, uint8_t dev_addr) {
+  uint8_t nbytes = 2;
+  uint8_t tmp[2] = {0, 0};
+  read_temperature_registers(i2c, dev_addr, TEMP_SET_MAX_REG, tmp, nbytes, "Temperature Set Limit");
+}
+
+void write_temp_set_limit(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t integer_part, uint8_t decimal_part) {
+  uint8_t nbytes = 2;
+  uint8_t tmp[2] = {integer_part, decimal_part};
+  write_temp_reg(i2c, dev_addr, TEMP_SET_MAX_REG, tmp, nbytes);
+  read_temp_set_limit(i2c, dev_addr);
+}
+
+void read_config(i2c_inst_t *i2c, uint8_t dev_addr) {
+  uint8_t nbytes = 1;
+  uint8_t tmp[1] = {0};
+  read_temp_reg(i2c, dev_addr, SENSOR_CONFIG_REG, tmp, nbytes);
+  printf("Sensor Config Status\n");
+  parse_config(tmp[0]);
 }

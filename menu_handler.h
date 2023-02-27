@@ -16,5 +16,7 @@ void show_landing_page();
 void show_config_menu();
 uint8_t show_dev_change_menu(uint8_t default_addr);
 uint32_t show_alert_menu(uint8_t *buf);
+void print_temp_table(uint8_t integer_part, uint8_t decimal_part);
+void parse_config(uint8_t conf);
 
 #endif

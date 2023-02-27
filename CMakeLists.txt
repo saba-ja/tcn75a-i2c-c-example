@@ -53,12 +53,12 @@ add_executable(${PROJECT_NAME}
     config.c
     util.h
     util.c
-    menu_handler.h
-    menu_handler.c
     gpio_util.h
     gpio_util.c
     i2c_util.h
     i2c_util.c
+    menu_handler.h
+    menu_handler.c
     debounce.h
     debounce.c
     main.c

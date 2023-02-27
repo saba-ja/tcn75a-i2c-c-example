@@ -6,6 +6,7 @@
 #include "i2c_util.h"
 #include "pico/time.h"
 #include "util.h"
+#include "config.h"
 
 void show_landing_page() {
   clear_screen();
@@ -274,4 +275,81 @@ uint32_t show_alert_menu(uint8_t *buf) {
     } else {
     }
   }
+}
+
+void print_temp_table(uint8_t integer_part, uint8_t decimal_part) {
+  printf("%-8s--%-8s\n", "-------", "-------");
+  printf("%-8s| %-8s\n", "Temp C", "Temp F");
+  printf("%-8s+ %-8s\n", "-------", "-------");
+  float celsius = fixedToFloat(integer_part, decimal_part);
+  printf("%-8.4f| %-8.4f\n", celsius, c2f(celsius));
+}
+
+void parse_config(uint8_t conf) {
+  printf("+--------------------+--------------+\n");
+  printf("|       Setting      |     Value    |\n");
+  printf("+--------------------+--------------+\n");
+  printf("| %-18s | ", "Shutdown:");
+  if ((conf & SHUTDOWN_MASK) == 0) {
+    printf("%-12s |\n", "Disable");
+  } else if ((conf & SHUTDOWN_MASK) == SHUTDOWN_MASK) {
+    printf("%-12s |\n", "Enable");
+  } else {
+    printf("%-12s |\n", "UNKNOWN");
+  }
+
+  printf("| %-18s | ", "Alert Mode:");
+  if ((conf & ALERT_MODE_MASK) >> 1 == 0) {
+    printf("%-12s |\n", "Comp");
+  } else if ((conf & ALERT_MODE_MASK) >> 1 == 1) {
+    printf("%-12s |\n", "Intr");
+  } else {
+    printf("%-12s |\n", "UNKNOWN");
+  }
+
+  printf("| %-18s | ", "Alert Polarity:");
+  if ((conf & ALERT_POLARITY_MASK) >> 2 == 0) {
+    printf("%-12s |\n", "Low");
+  } else if ((conf & ALERT_POLARITY_MASK) >> 2 == 1) {
+    printf("%-12s |\n", "High");
+  } else {
+    printf("%-12s |\n", "UNKNOWN");
+  }
+
+  printf("| %-18s | ", "Fault Queue:");
+  if ((conf & FAULT_QUEUE_MASK) >> 3 == 0) {
+    printf("%-12d |\n", 1);
+  } else if ((conf & FAULT_QUEUE_MASK) >> 3 == 1) {
+    printf("%-12d |\n", 2);
+  } else if ((conf & FAULT_QUEUE_MASK) >> 3 == 2) {
+    printf("%-12d |\n", 4);
+  } else if ((conf & FAULT_QUEUE_MASK) >> 3 == 3) {
+    printf("%-12d |\n", 6);
+  } else {
+    printf("%-12s |\n", "UNKNOWN");
+  }
+
+  printf("| %-18s | ", "ADC Resolution:");
+  if ((conf & ADC_RESOLUTION_MASK) >> 5 == 0) {
+    printf("%-12s |\n", "0.5C");
+  } else if ((conf & ADC_RESOLUTION_MASK) >> 5 == 1) {
+    printf("%-12s |\n", "0.25C");
+  } else if ((conf & ADC_RESOLUTION_MASK) >> 5 == 2) {
+    printf("%-12s |\n", "0.125C");
+  } else if ((conf & ADC_RESOLUTION_MASK) >> 5 == 3) {
+    printf("%-12s |\n", "0.0625C");
+  } else {
+    printf("%-12s |\n", "UNKNOWN");
+  }
+
+  printf("| %-18s | ", "One-Shot:");
+  if ((conf & ONE_SHOT_MASK) >> 7 == 0) {
+    printf("%-12s |\n", "Enable");
+  } else if ((conf & ONE_SHOT_MASK) >> 7 == 1) {
+    printf("%-12s |\n", "Disable");
+  } else {
+    printf("%-12s |\n", "UNKNOWN");
+  }
+
+  printf("+--------------------+--------------+\n");
 }
