@@ -8,7 +8,6 @@
 #include "pico/time.h"
 #include "util.h"
 
-
 void show_landing_page() {
   clear_screen();
   printf(" _____ ____ _   _ _____ ____    _    \n");
@@ -49,11 +48,11 @@ uint32_t show_config_menu() {
 
         if (option == '0') {
           // Disabling shutdown
-          return (1 << 31) | (0b00000000);
+          return SHUTDOWN_MODE_SHIFT | (0b00000000);
 
         } else if (option == '1') {
           // Enabling shutdown
-          return (1 << 31) | (0b00000001);
+          return SHUTDOWN_MODE_SHIFT | (0b00000001);
         } else if (option == 'x') {
           break;
         }
@@ -68,11 +67,9 @@ uint32_t show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          // Active Low selected
-          return (1 << 30) | (0b00000000);
+          return COMP_INT_MODE_SHIFT | (0b00000000);
         } else if (option == '1') {
-          // Active High selected
-          return (1 << 30) | (0b00000010);
+          return COMP_INT_MODE_SHIFT | (0b00000010);
         } else if (option == 'x') {
           break;
         }
@@ -88,10 +85,10 @@ uint32_t show_config_menu() {
 
         if (option == '0') {
           // Active Low selected
-          return (1 << 29) | (0b00000000);
+          return ALERT_POLARITY_SHIFT | (0b00000000);
         } else if (option == '1') {
           // Active High selected
-          return (1 << 29) | (0b00000100);
+          return ALERT_POLARITY_SHIFT | (0b00000100);
         } else if (option == 'x') {
           break;
         }
@@ -108,13 +105,13 @@ uint32_t show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          return (1 << 28) | (0b00000000);
+          return FAULT_QUEUE_MODE_SHIFT | (0b00000000);
         } else if (option == '1') {
-          return (1 << 28) | (0b00001000);
+          return FAULT_QUEUE_MODE_SHIFT | (0b00001000);
         } else if (option == '2') {
-          return (1 << 28) | (0b00010000);
+          return FAULT_QUEUE_MODE_SHIFT | (0b00010000);
         } else if (option == '3') {
-          return (1 << 28) | (0b00011000);
+          return FAULT_QUEUE_MODE_SHIFT | (0b00011000);
         } else if (option == 'x') {
           break;
         }
@@ -131,13 +128,13 @@ uint32_t show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          return (1 << 27) | (0b00000000);
+          return ADC_RESOLUTION_SHIFT | (0b00000000);
         } else if (option == '1') {
-          return (1 << 27) | (0b00100000);
+          return ADC_RESOLUTION_SHIFT | (0b00100000);
         } else if (option == '2') {
-          return (1 << 27) | (0b01000000);
+          return ADC_RESOLUTION_SHIFT | (0b01000000);
         } else if (option == '3') {
-          return (1 << 27) | (0b01100000);
+          return ADC_RESOLUTION_SHIFT | (0b01100000);
         } else if (option == 'x') {
           break;
         }
@@ -152,9 +149,9 @@ uint32_t show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          return (1 << 26) | (0b00000000);
+          return ONE_SHOT_MODE_SHIFT | (0b00000000);
         } else if (option == '1') {
-          return (1 << 26) | (0b10000000);
+          return ONE_SHOT_MODE_SHIFT | (0b10000000);
         } else if (option == 'x') {
           break;
         }
