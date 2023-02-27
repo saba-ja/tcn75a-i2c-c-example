@@ -51,16 +51,20 @@ pico_sdk_init()
 add_executable(${PROJECT_NAME}
     config.h
     config.c
-    util.h
-    util.c
+    core1.h
+    core1.c
+    debounce.h
+    debounce.c
+    globals.h
+    gpio_callback.c
     gpio_util.h
     gpio_util.c
     i2c_util.h
     i2c_util.c
     menu_handler.h
     menu_handler.c
-    debounce.h
-    debounce.c
+    util.h
+    util.c
     main.c
 )
 

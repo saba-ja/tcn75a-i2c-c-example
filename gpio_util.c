@@ -1,5 +1,8 @@
 #include "gpio_util.h"
 
+#include "hardware/gpio.h"
+
+
 void set_gpio(const GpioConfig *gpio, size_t len) {
   // Loop through the length of the GpioConfig array
   for (size_t i = 0; i < len; i++) {
@@ -9,6 +12,10 @@ void set_gpio(const GpioConfig *gpio, size_t len) {
     // Set the direction of the GPIO specified by the pin number and direction
     // in the current GpioConfig structure
     gpio_set_dir(gpio[i].pin_number, gpio[i].pin_dir);
+
+    if (gpio[i].has_pullup) {
+      gpio_pull_up(gpio[i].pin_number);
+    }
   }
 }
 
@@ -23,7 +30,7 @@ void enable_irq(const GpioConfig *gpio, size_t len) {
 }
 
 void disable_irq(const GpioConfig *gpio, size_t len) {
-    for (size_t i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     if (gpio[i].has_irq) {
       gpio_set_irq_enabled(gpio[i].pin_number,
                            GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, false);

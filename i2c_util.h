@@ -31,6 +31,8 @@ void read_temp_hyst_limit(i2c_inst_t *i2c, uint8_t dev_addr);
 void write_temp_hyst_limit(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t integer_part, uint8_t decimal_part);
 void read_temp_set_limit(i2c_inst_t *i2c, uint8_t dev_addr);
 void write_temp_set_limit(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t integer_part, uint8_t decimal_part);
-void read_config(i2c_inst_t *i2c, uint8_t dev_addr);
+uint8_t read_config(i2c_inst_t *i2c, uint8_t dev_addr);
+uint8_t write_config(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t conf);
+void print_temp_table(uint8_t integer_part, uint8_t decimal_part);
 
 #endif

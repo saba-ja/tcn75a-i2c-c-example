@@ -15,6 +15,7 @@
 #define BTN2 13
 #define BTN3 12
 #define BTN4 11
+#define ALERT_GP 18
 #define I2C_SDA_PIN 16
 #define I2C_SCL_PIN 17
 #define I2C_READ_TIMEOUT_MICRO_SEC 100000
@@ -26,7 +27,7 @@
 #define TCN75A_BAUDRATE (400 * 1000)
 #define BLINK_LED_DELAY 500
 
-#define NUMBER_OF_GPIOS 8
+#define NUMBER_OF_GPIOS 9
 #define NUMBER_OF_BTNS 8
 #define NUMBER_OF_I2C 1
 #define SHUTDOWN_MASK 0b00000001

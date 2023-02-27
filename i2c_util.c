@@ -2,7 +2,7 @@
 
 #include "util.h"
 #include "config.h"
-#include "menu_handler.h"
+#include <stdint.h>
 
 void set_i2c(const I2CConfig *i2c, size_t len) {
   for (size_t i; i < len; i++) {
@@ -150,10 +150,25 @@ void write_temp_set_limit(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t integer_par
   read_temp_set_limit(i2c, dev_addr);
 }
 
-void read_config(i2c_inst_t *i2c, uint8_t dev_addr) {
+uint8_t read_config(i2c_inst_t *i2c, uint8_t dev_addr) {
   uint8_t nbytes = 1;
   uint8_t tmp[1] = {0};
   read_temp_reg(i2c, dev_addr, SENSOR_CONFIG_REG, tmp, nbytes);
-  printf("Sensor Config Status\n");
-  parse_config(tmp[0]);
+  return tmp[0];
+}
+
+uint8_t write_config(i2c_inst_t *i2c, uint8_t dev_addr, uint8_t conf) {
+  uint8_t nbytes = 1;
+  uint8_t tmp[1] = {conf};
+  write_temp_reg(i2c, dev_addr, SENSOR_CONFIG_REG, tmp, nbytes);
+  return 0;
+}
+
+
+void print_temp_table(uint8_t integer_part, uint8_t decimal_part) {
+  printf("%-8s--%-8s\n", "-------", "-------");
+  printf("%-8s| %-8s\n", "Temp C", "Temp F");
+  printf("%-8s+ %-8s\n", "-------", "-------");
+  float celsius = fixedToFloat(integer_part, decimal_part);
+  printf("%-8.4f| %-8.4f\n", celsius, c2f(celsius));
 }

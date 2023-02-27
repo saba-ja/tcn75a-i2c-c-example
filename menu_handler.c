@@ -2,11 +2,12 @@
 
 #include <stdio.h>
 
+#include "config.h"
 #include "hardware/address_mapped.h"
 #include "i2c_util.h"
 #include "pico/time.h"
 #include "util.h"
-#include "config.h"
+
 
 void show_landing_page() {
   clear_screen();
@@ -24,7 +25,7 @@ void show_landing_page() {
   printf(" ------------------------------------------ \n");
 }
 
-void show_config_menu() {
+uint32_t show_config_menu() {
   char option;
   while (1) {
     clear_screen();
@@ -47,9 +48,12 @@ void show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          printf("Disabling shutdown.\n");
+          // Disabling shutdown
+          return (1 << 31) | (0b00000000);
+
         } else if (option == '1') {
-          printf("Enabling shutdown.\n");
+          // Enabling shutdown
+          return (1 << 31) | (0b00000001);
         } else if (option == 'x') {
           break;
         }
@@ -64,9 +68,11 @@ void show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          printf("Active Low selected.\n");
+          // Active Low selected
+          return (1 << 30) | (0b00000000);
         } else if (option == '1') {
-          printf("Active High selected.\n");
+          // Active High selected
+          return (1 << 30) | (0b00000010);
         } else if (option == 'x') {
           break;
         }
@@ -81,9 +87,11 @@ void show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          printf("Active Low selected.\n");
+          // Active Low selected
+          return (1 << 29) | (0b00000000);
         } else if (option == '1') {
-          printf("Active High selected.\n");
+          // Active High selected
+          return (1 << 29) | (0b00000100);
         } else if (option == 'x') {
           break;
         }
@@ -100,9 +108,13 @@ void show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          printf("Active Low selected.\n");
+          return (1 << 28) | (0b00000000);
         } else if (option == '1') {
-          printf("Active High selected.\n");
+          return (1 << 28) | (0b00001000);
+        } else if (option == '2') {
+          return (1 << 28) | (0b00010000);
+        } else if (option == '3') {
+          return (1 << 28) | (0b00011000);
         } else if (option == 'x') {
           break;
         }
@@ -119,9 +131,13 @@ void show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          printf("Active Low selected.\n");
+          return (1 << 27) | (0b00000000);
         } else if (option == '1') {
-          printf("Active High selected.\n");
+          return (1 << 27) | (0b00100000);
+        } else if (option == '2') {
+          return (1 << 27) | (0b01000000);
+        } else if (option == '3') {
+          return (1 << 27) | (0b01100000);
         } else if (option == 'x') {
           break;
         }
@@ -136,18 +152,17 @@ void show_config_menu() {
         scanf(" %c", &option);
 
         if (option == '0') {
-          printf("Active Low selected.\n");
+          return (1 << 26) | (0b00000000);
         } else if (option == '1') {
-          printf("Active High selected.\n");
+          return (1 << 26) | (0b10000000);
         } else if (option == 'x') {
           break;
         }
       }
     } else if (option == 'x') {
-      break;
+      return (1 << 16);
     }
   }
-  clear_screen();
 }
 
 uint8_t show_dev_change_menu(uint8_t default_addr) {
@@ -243,10 +258,10 @@ uint32_t show_alert_menu(uint8_t *buf) {
       get_input(input, 8);
       bool is_success = str_to_fixed_point(input, output);
       if (is_success) {
-          buf[0] = output[0];
-          buf[1] = output[1];
-          return WRITE_TEMP_HYST_LIMIT;
-      }  else {
+        buf[0] = output[0];
+        buf[1] = output[1];
+        return WRITE_TEMP_HYST_LIMIT;
+      } else {
         printf("Invalid input! Returning to the previous menu\n");
         sleep_ms(2000);
       }
@@ -258,10 +273,10 @@ uint32_t show_alert_menu(uint8_t *buf) {
       get_input(input, 8);
       bool is_success = str_to_fixed_point(input, output);
       if (is_success) {
-          buf[0] = output[0];
-          buf[1] = output[1];
-          return WRITE_TEMP_SET_LIMIT;
-      }  else {
+        buf[0] = output[0];
+        buf[1] = output[1];
+        return WRITE_TEMP_SET_LIMIT;
+      } else {
         printf("Invalid input! Returning to the previous menu\n");
         sleep_ms(2000);
       }
@@ -275,14 +290,6 @@ uint32_t show_alert_menu(uint8_t *buf) {
     } else {
     }
   }
-}
-
-void print_temp_table(uint8_t integer_part, uint8_t decimal_part) {
-  printf("%-8s--%-8s\n", "-------", "-------");
-  printf("%-8s| %-8s\n", "Temp C", "Temp F");
-  printf("%-8s+ %-8s\n", "-------", "-------");
-  float celsius = fixedToFloat(integer_part, decimal_part);
-  printf("%-8.4f| %-8.4f\n", celsius, c2f(celsius));
 }
 
 void parse_config(uint8_t conf) {
@@ -299,54 +306,54 @@ void parse_config(uint8_t conf) {
   }
 
   printf("| %-18s | ", "Alert Mode:");
-  if ((conf & ALERT_MODE_MASK) >> 1 == 0) {
+  if (((conf & ALERT_MODE_MASK) >> 1) == 0) {
     printf("%-12s |\n", "Comp");
-  } else if ((conf & ALERT_MODE_MASK) >> 1 == 1) {
+  } else if (((conf & ALERT_MODE_MASK) >> 1) == 1) {
     printf("%-12s |\n", "Intr");
   } else {
     printf("%-12s |\n", "UNKNOWN");
   }
 
   printf("| %-18s | ", "Alert Polarity:");
-  if ((conf & ALERT_POLARITY_MASK) >> 2 == 0) {
+  if (((conf & ALERT_POLARITY_MASK) >> 2) == 0) {
     printf("%-12s |\n", "Low");
-  } else if ((conf & ALERT_POLARITY_MASK) >> 2 == 1) {
+  } else if (((conf & ALERT_POLARITY_MASK) >> 2) == 1) {
     printf("%-12s |\n", "High");
   } else {
     printf("%-12s |\n", "UNKNOWN");
   }
 
   printf("| %-18s | ", "Fault Queue:");
-  if ((conf & FAULT_QUEUE_MASK) >> 3 == 0) {
+  if (((conf & FAULT_QUEUE_MASK) >> 3) == 0) {
     printf("%-12d |\n", 1);
-  } else if ((conf & FAULT_QUEUE_MASK) >> 3 == 1) {
+  } else if (((conf & FAULT_QUEUE_MASK) >> 3) == 1) {
     printf("%-12d |\n", 2);
-  } else if ((conf & FAULT_QUEUE_MASK) >> 3 == 2) {
+  } else if (((conf & FAULT_QUEUE_MASK) >> 3) == 2) {
     printf("%-12d |\n", 4);
-  } else if ((conf & FAULT_QUEUE_MASK) >> 3 == 3) {
+  } else if (((conf & FAULT_QUEUE_MASK) >> 3) == 3) {
     printf("%-12d |\n", 6);
   } else {
     printf("%-12s |\n", "UNKNOWN");
   }
 
   printf("| %-18s | ", "ADC Resolution:");
-  if ((conf & ADC_RESOLUTION_MASK) >> 5 == 0) {
+  if (((conf & ADC_RESOLUTION_MASK) >> 5) == 0) {
     printf("%-12s |\n", "0.5C");
-  } else if ((conf & ADC_RESOLUTION_MASK) >> 5 == 1) {
+  } else if (((conf & ADC_RESOLUTION_MASK) >> 5) == 1) {
     printf("%-12s |\n", "0.25C");
-  } else if ((conf & ADC_RESOLUTION_MASK) >> 5 == 2) {
+  } else if (((conf & ADC_RESOLUTION_MASK) >> 5) == 2) {
     printf("%-12s |\n", "0.125C");
-  } else if ((conf & ADC_RESOLUTION_MASK) >> 5 == 3) {
+  } else if (((conf & ADC_RESOLUTION_MASK) >> 5) == 3) {
     printf("%-12s |\n", "0.0625C");
   } else {
     printf("%-12s |\n", "UNKNOWN");
   }
 
   printf("| %-18s | ", "One-Shot:");
-  if ((conf & ONE_SHOT_MASK) >> 7 == 0) {
-    printf("%-12s |\n", "Enable");
-  } else if ((conf & ONE_SHOT_MASK) >> 7 == 1) {
+  if (((conf & ONE_SHOT_MASK) >> 7) == 0) {
     printf("%-12s |\n", "Disable");
+  } else if (((conf & ONE_SHOT_MASK) >> 7) == 1) {
+    printf("%-12s |\n", "Enable");
   } else {
     printf("%-12s |\n", "UNKNOWN");
   }

@@ -23,6 +23,7 @@ typedef struct {
   uint pin_number;
   uint pin_dir;
   bool has_irq;
+  bool has_pullup;
 } GpioConfig;
 
 void set_gpio(const GpioConfig *gpio, size_t len);
