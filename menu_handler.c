@@ -8,6 +8,11 @@
 #include "pico/time.h"
 #include "util.h"
 
+/**
+ * Displays a landing page with options for the user to select.
+ * The user can press a button to scan I2C addresses, access the config menu,
+ * access the device ID menu, access the alert menu, or print the temperature.
+ */
 void show_landing_page() {
   clear_screen();
   printf(" _____ ____ _   _ _____ ____    _    \n");
@@ -24,6 +29,19 @@ void show_landing_page() {
   printf(" ------------------------------------------ \n");
 }
 
+/**
+
+    @brief Displays a configuration menu for the temperature sensor and returns
+   the selected configuration. The function displays a menu with several
+   configuration options for the temperature sensor. The user can select an
+   option by entering the corresponding number or letter on the keyboard. If the
+   user selects an option that requires further configuration, such as the
+   SHUTDOWN Setting or COMP/INT Select options, the function displays a sub-menu
+   with additional configuration options. Once the user has made their
+   selections, the function returns a 32-bit integer that encodes the selected
+   configuration options using bit shifting and bitwise OR operations.
+    @return A 32-bit integer that encodes the selected configuration options.
+    */
 uint32_t show_config_menu() {
   char option;
   while (1) {
@@ -162,6 +180,17 @@ uint32_t show_config_menu() {
   }
 }
 
+/**
+  @brief Displays a menu for changing the device ID and returns the selected
+  device ID. The function displays a menu with several device ID options. The
+  user can select a device ID by entering the corresponding number on the
+  keyboard. Once the user has made their selection, the function returns the
+  selected device ID as a uint8_t. If the user selects 'x', the function
+  returns 0.
+  @param default_addr The default device ID to be pre-selected in the menu.
+  @return The selected device ID, or 0 if the user chooses to return to the
+  main menu.
+*/
 uint8_t show_dev_change_menu(uint8_t default_addr) {
   char option = '0';
   uint8_t addr = default_addr;
@@ -217,37 +246,33 @@ uint8_t show_dev_change_menu(uint8_t default_addr) {
   }
 }
 
+/**
+  @brief Displays a menu for configuring the temperature alert settings and
+   returns the selected configuration. The function displays a menu with several
+   alert configuration options. The user can select an option by entering the
+   corresponding number on the keyboard. If the user selects an option that
+   requires further input, such as Write Temp Hyst Limit or Write Temp Set Limit
+   options, the function prompts the user to enter a value and stores the result
+   in a buffer. The function returns an integer that encodes the selected alert
+   configuration option. If the user selects 'x', the function returns without
+   modifying the buffer and without changing any configuration.
+  @param buf A pointer to a buffer to store any user input values required for
+   alert configuration.
+  @return An integer that encodes the selected alert configuration option.
+*/
 uint32_t show_alert_menu(uint8_t *buf) {
   char option;
   while (1) {
     clear_screen();
     printf("ALERT Config\n");
-    printf("[0] Alert Enable/Disable\n");
-    printf("[1] Write Temp Hyst Limit\n");
-    printf("[2] Write Temp Set Limit\n");
-    printf("[3] Show Temp Hyst Limit\n");
-    printf("[4] Show Temp Set Limit\n");
+    printf("[0] Write Temp Hyst Limit\n");
+    printf("[1] Write Temp Set Limit\n");
+    printf("[2] Show Temp Hyst Limit\n");
+    printf("[3] Show Temp Set Limit\n");
     printf("[x] Return to main\n");
     scanf(" %c", &option);
 
     if (option == '0') {
-      while (1) {
-        clear_screen();
-        printf("ALERT Setting\n");
-        printf("[0] Disable ALERT\n");
-        printf("[1] Enable ALERT\n");
-        printf("[x] Return to main\n");
-        scanf(" %c", &option);
-
-        if (option == '0') {
-          printf("Disabling ALERT.\n");
-        } else if (option == '1') {
-          printf("Enabling ALERT.\n");
-        } else if (option == 'x') {
-          break;
-        }
-      }
-    } else if (option == '1') {
       char input[8];
       int32_t output[2];
       clear_screen();
@@ -262,7 +287,7 @@ uint32_t show_alert_menu(uint8_t *buf) {
         printf("Invalid input! Returning to the previous menu\n");
         sleep_ms(2000);
       }
-    } else if (option == '2') {
+    } else if (option == '1') {
       char input[8];
       int32_t output[2];
       clear_screen();
@@ -277,9 +302,9 @@ uint32_t show_alert_menu(uint8_t *buf) {
         printf("Invalid input! Returning to the previous menu\n");
         sleep_ms(2000);
       }
-    } else if (option == '3') {
+    } else if (option == '2') {
       return READ_TEMP_HYST_LIMIT;
-    } else if (option == '4') {
+    } else if (option == '3') {
       return READ_TEMP_SET_LIMIT;
     } else if (option == 'x') {
       clear_screen();
@@ -289,6 +314,17 @@ uint32_t show_alert_menu(uint8_t *buf) {
   }
 }
 
+/**
+  @brief Parses a 32-bit integer that encodes temperature sensor configuration
+  settings and prints them to the console. The function takes a 32-bit integer
+  as input that encodes temperature sensor configuration settings. It then
+  parses the integer and prints the settings in a formatted table to the
+  console. The table includes settings for Shutdown, Alert Mode, Alert Polarity,
+  Fault Queue, ADC Resolution, and One-Shot. If a configuration setting is
+  unknown, the function prints 'UNKNOWN' in the Value column of the table.
+  @param conf A 32-bit integer that encodes the temperature sensor configuration
+  settings.
+*/
 void parse_config(uint8_t conf) {
   printf("+--------------------+--------------+\n");
   printf("|       Setting      |     Value    |\n");
