@@ -45,12 +45,7 @@ bool has_changed(bool prev_state, bool curr_state) {
  * sufficient amount of time, false otherwise.
  */
 bool debounce(const volatile BtnState btn) {
-  if (has_changed(btn.prev_state, btn.curr_state)) {
-    if (is_stable(btn.prev_time, btn.curr_time)) {
-      return true;
-    }
-  }
-  return false;
+
 }
 
 /**
@@ -59,10 +54,7 @@ bool debounce(const volatile BtnState btn) {
  * @param btn The button state to be updated.
  */
 void set_rising_edge_state(volatile BtnState *btn) {
-  btn->prev_state = 0;
-  btn->curr_state = 1;
-  btn->prev_time = get_absolute_time();
-  btn->curr_time = 0;
+
 }
 
 /**
@@ -71,9 +63,7 @@ void set_rising_edge_state(volatile BtnState *btn) {
  * @param btn The button state to be updated.
  */
 void set_falling_edge_state(volatile BtnState *btn) {
-  btn->prev_state = 1;
-  btn->curr_state = 0;
-  btn->curr_time = get_absolute_time();
+
 }
 
 /**
@@ -82,10 +72,7 @@ void set_falling_edge_state(volatile BtnState *btn) {
  * @param btn The button state to be reset.
  */
 void reset_btn_state(volatile BtnState *btn) {
-  btn->prev_state = 0;
-  btn->curr_state = 0;
-  btn->prev_time = 0;
-  btn->curr_time = 0;
+
 }
 
 /**
@@ -94,8 +81,7 @@ void reset_btn_state(volatile BtnState *btn) {
  * @param btn The button state to be updated.
  */
 void update_btn_state(volatile BtnState *btn) {
-  btn->prev_state = btn->curr_state;
-  btn->curr_state = gpio_get(btn->but_pin);
+
 }
 
 /**
@@ -104,6 +90,5 @@ void update_btn_state(volatile BtnState *btn) {
  * @param btn The button state whose time stamps are to be updated.
  */
 void update_btn_time(volatile BtnState *btn) {
-  btn->prev_time = btn->curr_time;
-  btn->curr_time = get_absolute_time();
+
 }
