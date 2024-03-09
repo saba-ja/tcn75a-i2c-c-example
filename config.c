@@ -5,9 +5,9 @@
 // Define an array of GpioConfig structures that define the configuration for
 // each GPIO pin used by the program.
 const GpioConfig proj_gpio[NUMBER_OF_GPIOS] = {
-    {BTN0, GPIO_IN, true, false},    {BTN1, GPIO_IN, true, false},
-    {BTN2, GPIO_IN, true, false},    {BTN3, GPIO_IN, true, false},
-    {BTN4, GPIO_IN, true, false},    {LED0, GPIO_OUT, false, false},
+    {BTN0, GPIO_IN, true, true},    {BTN1, GPIO_IN, true, true},
+    {BTN2, GPIO_IN, true, true},    {BTN3, GPIO_IN, true, true},
+    {BTN4, GPIO_IN, true, true},    {LED0, GPIO_OUT, false, false},
     {LED1, GPIO_OUT, false, false},  {ONBOARD_LED, GPIO_OUT, false, false},
     {ALERT_GP, GPIO_IN, false, true}};
 
